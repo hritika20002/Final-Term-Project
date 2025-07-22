@@ -1,5 +1,6 @@
 <?php
 session_start();
+include 'includes/header.php';
 require 'db.php';
 
 // Fetch latest 6 products
@@ -49,3 +50,4 @@ $products = $stmt->fetchAll();
 
 </body>
 </html>
+<?php include 'includes/footer.php';?>

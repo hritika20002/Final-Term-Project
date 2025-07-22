@@ -1,51 +1,65 @@
 <?php
 session_start();
-require 'db.php'; 
+require 'db.php';
 
-// Fetch latest 6 products
-$stmt = $pdo->query("SELECT * FROM products ORDER BY id DESC LIMIT 6");
-$products = $stmt->fetchAll();
+$error = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+
+    if (empty($email) || empty($password)) {
+        $error = "Please enter both email and password.";
+    } else {
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($password, $user['password'])) {
+            // Set session and redirect
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+                'is_admin' => $user['is_admin']
+            ];
+            if ($user['is_admin']) {
+                header("Location: admin/dashboard.php");
+            } else {
+                header("Location: index.php");
+            }
+            exit;
+        } else {
+            $error = "Invalid email or password.";
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Online Computer Store - Home</title>
-    <link href="css/style.css" rel="stylesheet"> <!-- Your custom SASS-compiled CSS -->
+    <title>Login - Online Computer Store</title>
+    <link href="css/style.css" rel="stylesheet">
 </head>
 <body class="bg-light">
-
-<div class="container py-5">
-    <h1 class="mb-4">Welcome to the Online Computer Store</h1>
-
-    <?php if (isset($_SESSION['user'])): ?>
-        <p>Hello, <strong><?= htmlspecialchars($_SESSION['user']['name']) ?></strong> |
-            <a href="logout.php">Logout</a>
-        </p>
-    <?php else: ?>
-        <p><a href="login.php">Login</a> or <a href="register.php">Register</a></p>
+<div class="container mt-5" style="max-width: 400px;">
+    <h2 class="mb-4">User Login</h2>
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
-
-    <h3 class="mt-5 mb-3">Featured Products</h3>
-    <div class="row">
-        <?php foreach ($products as $product): ?>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="<?= htmlspecialchars($product['image_url']) ?>" class="card-img-top" alt="<?= $product['name'] ?>" style="height:200px;object-fit:contain;">
-                    <div class="card-body">
-                        <h5 class="card-title"><?= htmlspecialchars($product['name']) ?></h5>
-                        <p class="card-text">$<?= $product['price'] ?></p>
-                        <a href="product.php?id=<?= $product['id'] ?>" class="btn btn-primary">View</a>
-                    </div>
-                </div>
-            </div>
-        <?php endforeach; ?>
-    </div>
-
-    <div class="text-center mt-4">
-        <a href="products.php" class="btn btn-secondary">Browse All Products</a>
-    </div>
+    <form method="POST" class="bg-white p-4 rounded shadow">
+        <div class="mb-3">
+            <label>Email Address</label>
+            <input type="email" name="email" required class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Password</label>
+            <input type="password" name="password" required class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+        <p class="mt-3">Don't have an account? <a href="register.php">Register here</a></p>
+    </form>
 </div>
-
 </body>
 </html>
