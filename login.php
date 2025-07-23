@@ -1,6 +1,7 @@
 <?php
 session_start();
-require 'db.php';
+require 'includes/db.php';
+
 
 $error = '';
 
@@ -60,6 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <button type="submit" class="btn btn-primary w-100">Login</button>
         <p class="mt-3">Don't have an account? <a href="register.php">Register here</a></p>
     </form>
+  <div class="d-grid mt-3">
+    <a href="index.php" class="btn btn-primary">Back to Home</a>
+</div>
+
+
 </div>
 </body>
 </html>

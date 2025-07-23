@@ -1,6 +1,7 @@
 <?php
 session_start();
-require '../db.php';
+require 'includes/db.php';
+
 
 // Check admin login
 if (!isset($_SESSION['user']) || $_SESSION['user']['is_admin'] != 1) {

@@ -1,7 +1,7 @@
 <?php
 session_start();
 include 'includes/header.php';
-require 'db.php';
+require 'includes/db.php';
 
 // Fetch latest 6 products
 $stmt = $pdo->query("SELECT * FROM products ORDER BY id DESC LIMIT 6");
@@ -32,10 +32,10 @@ $products = $stmt->fetchAll();
         <?php foreach ($products as $product): ?>
             <div class="col-md-4 mb-4">
                 <div class="card h-100 shadow-sm">
-                    <img src="<?= htmlspecialchars($product['image_url']) ?>" class="card-img-top" alt="<?= $product['name'] ?>" style="height:200px;object-fit:contain;">
+                    <img src="pics/<?= htmlspecialchars($product['image']) ?>" class="card-img-top" alt="<?= htmlspecialchars($product['name']) ?>" style="height:200px;object-fit:contain;">
                     <div class="card-body">
                         <h5 class="card-title"><?= htmlspecialchars($product['name']) ?></h5>
-                        <p class="card-text">$<?= $product['price'] ?></p>
+                        <p class="card-text">$<?= number_format($product['price'], 2) ?></p>
                         <a href="product.php?id=<?= $product['id'] ?>" class="btn btn-primary">View</a>
                     </div>
                 </div>
@@ -44,10 +44,12 @@ $products = $stmt->fetchAll();
     </div>
 
     <div class="text-center mt-4">
-        <a href="products.php" class="btn btn-secondary">Browse All Products</a>
+        <a href="products.php" class="btn btn-secondary me-2">Browse All Products</a>
+        <a href="cart.php" class="btn btn-success">View Cart</a>
     </div>
 </div>
 
 </body>
 </html>
-<?php include 'includes/footer.php';?>
+
+<?php include 'includes/footer.php'; ?>

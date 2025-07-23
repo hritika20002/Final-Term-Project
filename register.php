@@ -1,67 +1,87 @@
 <?php
-$title = "Registeration";
 session_start();
-require 'db.php';
-include 'includes/header.php';
+require 'includes/db.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $name     = trim($_POST['name']);
-    $email    = trim($_POST['email']);
-    $password = $_POST['password'];
-    $confirm  = $_POST['confirm'];
+$error = '';
+$success = '';
 
-    if (empty($name) || empty($email) || empty($password)) {
-        $error = "All fields are required.";
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $password = $_POST['password'] ?? '';
+    $confirm = $_POST['confirm'] ?? '';
+
+    if (empty($name) || empty($email) || empty($password) || empty($confirm)) {
+        $error = "Please fill in all fields.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = "Invalid email format.";
     } elseif ($password !== $confirm) {
         $error = "Passwords do not match.";
     } else {
+        // Check if email already exists
         $stmt = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);
 
         if ($stmt->rowCount() > 0) {
             $error = "Email is already registered.";
         } else {
+            // Insert new user
             $hash = password_hash($password, PASSWORD_DEFAULT);
             $insert = $pdo->prepare("INSERT INTO users (name, email, password) VALUES (?, ?, ?)");
             if ($insert->execute([$name, $email, $hash])) {
-                $success = "Registration successful. <a href='login.php'>Login</a>";
+                $success = "Registration successful. <a href='login.php'>Login here</a>";
             } else {
-                $error = "Registration failed.";
+                $error = "Registration failed. Please try again.";
             }
         }
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register - Online Computer Store</title>
+    <link href="css/style.css" rel="stylesheet">
+</head>
 <body class="bg-light">
-<div class="container mt-5">
-    <h2>User Registration</h2>
+<div class="container mt-5" style="max-width: 400px;">
+    <h2 class="mb-4">Create a New Account</h2>
 
-    <?php if (isset($error)) echo "<div class='alert alert-danger'>$error</div>"; ?>
-    <?php if (isset($success)) echo "<div class='alert alert-success'>$success</div>"; ?>
+    <?php if ($error): ?>
+        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php elseif ($success): ?>
+        <div class="alert alert-success"><?= $success ?></div>
+    <?php endif; ?>
 
-    <form method="POST" class="bg-white p-4 rounded shadow" style="max-width: 500px;">
+    <form method="POST" class="bg-white p-4 rounded shadow">
         <div class="mb-3">
-            <label>Full Name</label>
-            <input type="text" name="name" required class="form-control">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" id="name" name="name" required class="form-control" value="<?= htmlspecialchars($_POST['name'] ?? '') ?>">
         </div>
+
         <div class="mb-3">
-            <label>Email Address</label>
-            <input type="email" name="email" required class="form-control">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" id="email" name="email" required class="form-control" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
         </div>
+
         <div class="mb-3">
-            <label>Password</label>
-            <input type="password" name="password" required class="form-control">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" required class="form-control">
         </div>
+
         <div class="mb-3">
-            <label>Confirm Password</label>
-            <input type="password" name="confirm" required class="form-control">
+            <label for="confirm" class="form-label">Confirm Password</label>
+            <input type="password" id="confirm" name="confirm" required class="form-control">
         </div>
-        <button type="submit" class="btn btn-success w-100">Register</button>
-        <p class="mt-3">Already have an account? <a href="login.php">Login here</a></p>
+
+        <button type="submit" class="btn btn-primary w-100">Register</button>
+        <p class="mt-3 text-center">Already have an account? <a href="login.php">Login here</a></p>
+  <div class="d-grid mt-3">
+    <a href="index.php" class="btn btn-primary">Back to Home</a>
+</div>
+
     </form>
+</div>
 </body>
-
-<?php include 'includes/footer.php';
-?>
+</html>

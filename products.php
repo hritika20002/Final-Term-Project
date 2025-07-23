@@ -1,15 +1,15 @@
 <?php
 session_start();
-require 'db.php';
+require 'includes/db.php';
 
-// Get selected category from URL if exists
+// Get selected category from URL if any
 $category = $_GET['category'] ?? '';
 
-// Fetch distinct categories for filter dropdown
+// Fetch all distinct categories for dropdown
 $stmt = $pdo->query("SELECT DISTINCT category FROM products");
 $categories = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-// Prepare product query with optional category filter
+// Prepare query based on category filter
 if ($category && in_array($category, $categories)) {
     $stmt = $pdo->prepare("SELECT * FROM products WHERE category = ?");
     $stmt->execute([$category]);
@@ -17,40 +17,37 @@ if ($category && in_array($category, $categories)) {
     $category = '';
     $stmt = $pdo->query("SELECT * FROM products");
 }
+
 $products = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Browse Products - Online Computer Store</title>
+    <title>Browse Products - Computer Store</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <style>
+        .product-card {
+            margin-bottom: 30px;
+        }
+        .product-img {
+            height: 250px;
+            object-fit: contain;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
+<?php include 'includes/header.php'; ?>
+
 <div class="container py-4">
-    <h1>All Products</h1>
-
-    <!-- Navigation -->
-    <nav class="mb-4">
-        <a href="index.php" class="btn btn-outline-primary me-2">Home</a>
-
-        <?php if (isset($_SESSION['user'])): ?>
-            <span class="me-3">Hello, <strong><?= htmlspecialchars($_SESSION['user']['name']) ?></strong></span>
-            <a href="logout.php" class="btn btn-outline-danger me-2">Logout</a>
-        <?php else: ?>
-            <a href="login.php" class="btn btn-outline-success me-2">Login</a>
-            <a href="register.php" class="btn btn-outline-secondary me-2">Register</a>
-        <?php endif; ?>
-
-        <!-- Placeholder Cart link -->
-        <a href="cart.php" class="btn btn-outline-warning">Cart</a>
-    </nav>
+    <h1 class="mb-4">Products</h1>
 
     <!-- Category Filter -->
     <form method="GET" class="mb-4">
         <label for="category" class="form-label">Filter by Category:</label>
-        <select id="category" name="category" class="form-select" onchange="this.form.submit()">
+        <select id="category" name="category" class="form-select w-auto d-inline-block" onchange="this.form.submit()">
             <option value="">All Categories</option>
             <?php foreach ($categories as $cat): ?>
                 <option value="<?= htmlspecialchars($cat) ?>" <?= $cat === $category ? 'selected' : '' ?>>
@@ -62,17 +59,19 @@ $products = $stmt->fetchAll();
 
     <!-- Products Grid -->
     <div class="row">
-        <?php if (count($products) === 0): ?>
+        <?php if (empty($products)): ?>
             <p>No products found in this category.</p>
         <?php else: ?>
             <?php foreach ($products as $product): ?>
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100 shadow-sm">
-                        <img src="<?= htmlspecialchars($product['image_url']) ?>" alt="<?= htmlspecialchars($product['name']) ?>" class="card-img-top" style="height:200px;object-fit:contain;">
-                        <div class="card-body">
+                <div class="col-md-4 product-card">
+                    <div class="card shadow-sm h-100">
+                        <img src="pics/<?= htmlspecialchars($product['image']) ?>" 
+                             class="card-img-top product-img" 
+                             alt="<?= htmlspecialchars($product['name']) ?>">
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title"><?= htmlspecialchars($product['name']) ?></h5>
-                            <p class="card-text">$<?= $product['price'] ?></p>
-                            <a href="product.php?id=<?= $product['id'] ?>" class="btn btn-primary">View Details</a>
+                            <p class="card-text text-success fw-bold">$<?= number_format($product['price'], 2) ?></p>
+                            <a href="product.php?id=<?= $product['id'] ?>" class="btn btn-primary mt-auto">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -81,5 +80,7 @@ $products = $stmt->fetchAll();
     </div>
 </div>
 
+<?php include 'includes/footer.php'; ?>
+<script src="js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

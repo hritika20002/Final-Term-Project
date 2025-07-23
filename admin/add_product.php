@@ -1,6 +1,6 @@
 <?php
 session_start();
-require '../db.php';
+require 'includes/db.php';
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['is_admin'] != 1) {
     header("Location: ../login.php");

@@ -1,6 +1,7 @@
 <?php
 session_start();
-require 'db.php';
+require 'includes/db.php';
+
 
 // Get product ID from URL
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
