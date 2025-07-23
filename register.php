@@ -1,6 +1,8 @@
 <?php
+$title = "Registeration";
 session_start();
 require 'db.php';
+include 'includes/header.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name     = trim($_POST['name']);
@@ -32,14 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-    <link href="bootstrap.min.css" rel="stylesheet">
-    <link href="css/style.css" rel="stylesheet"> <!-- Your custom styles -->
-</head>
 <body class="bg-light">
 <div class="container mt-5">
     <h2>User Registration</h2>
@@ -67,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <button type="submit" class="btn btn-success w-100">Register</button>
         <p class="mt-3">Already have an account? <a href="login.php">Login here</a></p>
     </form>
-</div>
 </body>
-</html>
+
+<?php include 'includes/footer.php';
+?>
