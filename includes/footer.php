@@ -1,4 +1,4 @@
-<footer class="bg-dark text-white py-4 mt-auto" style="left:0; bottom:0; width:100%; z-index:1030; height:10%;">
+<footer class="bg-dark text-white py-4 mt-auto" style="left:0; bottom:0; width:100vw; z-index:1030; height:10%;">
     <div class="container justify-content-center align-items-center h-100">
         <div class="row w-100 text-center">
             <div class="col-md-6 mb-2 mb-md-0">
