@@ -6,12 +6,12 @@ if (session_status() === PHP_SESSION_NONE) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Computer Store - <?php echo isset($title) ? htmlspecialchars($title) : 'Welcome'; ?></title>
-    <link rel="stylesheet" href="/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <!-- Optional: Font Awesome for cart icon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <title>Computer Store - <?= isset($title) ? htmlspecialchars($title) : 'Welcome' ?></title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- Optional: Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
@@ -32,7 +32,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         <a class="nav-link" href="cart.php">
                             <i class="fas fa-shopping-cart"></i> Cart
                             <?php if (!empty($_SESSION['cart'])): ?>
-                                <span class="badge bg-light text-dark"><?php echo count($_SESSION['cart']); ?></span>
+                                <span class="badge bg-light text-dark"><?= count($_SESSION['cart']) ?></span>
                             <?php endif; ?>
                         </a>
                     </li>
@@ -47,4 +47,3 @@ if (session_status() === PHP_SESSION_NONE) {
 </nav>
 
 <div style="margin-top: 70px;"></div>
-<script src="/js/bootstrap.bundle.min.js"></script>

@@ -2,15 +2,14 @@
     <div class="container justify-content-center align-items-center h-100">
         <div class="row w-100 text-center">
             <div class="col-md-6 mb-2 mb-md-0">
-                <h5 class ="text-center"><b>Computer Store</b></h5>
+                <h5 class="text-center"><b>Computer Store</b></h5>
                 <ul class="list-unstyled text-center">
                     <li><a href="products.php" class="text-white text-decoration-none">Products</a></li>
                     <li><a href="about.php" class="text-white text-decoration-none">About Us</a></li>
                     <li><a href="admin/dashboard.php" class="text-white text-decoration-none">Admin</a></li>
                 </ul>
             </div>
-            <div class="col-md-6" >
-                
+            <div class="col-md-6">
                 <h5><b>Contact</b></h5>
                 <ul class="list-unstyled">
                     <li><a href="mailto:info@computerstore.com" class="text-white text-decoration-none">info@computerstore.com</a></li>
@@ -26,3 +25,8 @@
         </div>
     </div>
 </footer>
+
+<!-- Bootstrap JS Bundle -->
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

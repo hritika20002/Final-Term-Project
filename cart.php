@@ -1,8 +1,7 @@
 <?php
 session_start();
-require 'includes/db.php';  
+require 'includes/db.php';
 
-// Redirect to login if user not logged in
 if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit;
@@ -10,35 +9,18 @@ if (!isset($_SESSION['user'])) {
 
 $user_id = $_SESSION['user']['id'];
 
-// Handle form submission for updating or removing items
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['update']) && isset($_POST['quantities']) && is_array($_POST['quantities'])) {
-        foreach ($_POST['quantities'] as $cart_id => $qty) {
-            $qty = (int)$qty;
-            if ($qty < 1) $qty = 1;
-
-            // Check stock availability
-            $stmt = $pdo->prepare("SELECT p.stock FROM products p JOIN cart c ON p.id = c.product_id WHERE c.id = ? AND c.user_id = ?");
-            $stmt->execute([$cart_id, $user_id]);
-            $stock = $stmt->fetchColumn();
-
-            if ($stock !== false && $qty <= $stock) {
-                $update = $pdo->prepare("UPDATE cart SET quantity = ? WHERE id = ? AND user_id = ?");
-                $update->execute([$qty, $cart_id, $user_id]);
-            }
-        }
-        $message = "Cart updated successfully.";
-    } elseif (isset($_POST['remove'])) {
-        $cart_id = (int)$_POST['remove'];
-        $delete = $pdo->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
-        $delete->execute([$cart_id, $user_id]);
-        $message = "Item removed from cart.";
-    }
+// Handle remove request
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['remove_cart_id'])) {
+    $remove_id = $_POST['remove_cart_id'];
+    $stmt = $pdo->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
+    $stmt->execute([$remove_id, $user_id]);
+    header("Location: cart.php");
+    exit;
 }
 
 // Fetch cart items
 $stmt = $pdo->prepare("
-    SELECT c.id AS cart_id, p.id AS product_id, p.name, p.price, p.image_url, c.quantity, p.stock
+    SELECT c.id AS cart_id, p.name, p.price, p.image AS image_url, c.quantity
     FROM cart c
     JOIN products p ON c.product_id = p.id
     WHERE c.user_id = ?
@@ -46,74 +28,52 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id]);
 $cart_items = $stmt->fetchAll();
 
-// Calculate total price
-$total_price = 0;
+$total = 0;
 foreach ($cart_items as $item) {
-    $total_price += $item['price'] * $item['quantity'];
+    $total += $item['price'] * $item['quantity'];
 }
 ?>
 
-<?php include 'includes/header2.php'; ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 
-<div class="container py-4">
-    <h1>Your Shopping Cart</h1>
-
-    <?php if (isset($message)): ?>
-        <div class="alert alert-success"><?= htmlspecialchars($message) ?></div>
-    <?php endif; ?>
+<div class="card p-4 shadow" style="min-width: 400px; max-width: 600px; width: 100%;">
+    <h3 class="text-center mb-4">Your Cart</h3>
 
     <?php if (empty($cart_items)): ?>
-        <p>Your cart is empty. <a href="products.php">Shop now</a></p>
+        <p class="text-center">Your cart is empty.</p>
     <?php else: ?>
-        <form method="POST" action="">
-            <table class="table table-bordered align-middle">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th style="width:120px;">Quantity</th>
-                        <th>Subtotal</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($cart_items as $item): ?>
-                        <tr>
-                            <td>
-                                <img src="<?= htmlspecialchars($item['image_url']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" style="height:50px; width:50px; object-fit:contain;">
-                                <?= htmlspecialchars($item['name']) ?>
-                            </td>
-                            <td>$<?= number_format($item['price'], 2) ?></td>
-                            <td>
-                                <input
-                                    type="number"
-                                    name="quantities[<?= (int)$item['cart_id'] ?>]"
-                                    value="<?= (int)$item['quantity'] ?>"
-                                    min="1"
-                                    max="<?= (int)$item['stock'] ?>"
-                                    class="form-control"
-                                    style="width:80px;"
-                                >
-                            </td>
-                            <td>$<?= number_format($item['price'] * $item['quantity'], 2) ?></td>
-                            <td>
-                                <button type="submit" name="remove" value="<?= (int)$item['cart_id'] ?>" class="btn btn-sm btn-danger">Remove</button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                        <td colspan="2"><strong>$<?= number_format($total_price, 2) ?></strong></td>
-                    </tr>
-                </tfoot>
-            </table>
+        <?php foreach ($cart_items as $item): ?>
+            <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                <img src="pics/<?= htmlspecialchars($item['image_url']) ?>" alt="<?= htmlspecialchars($item['name']) ?>" style="width: 60px; height: 60px; object-fit: contain; margin-right: 15px;">
+                <div class="flex-grow-1">
+                    <div><strong><?= htmlspecialchars($item['name']) ?></strong></div>
+                    <div>Qty: <?= $item['quantity'] ?></div>
+                    <div>$<?= number_format($item['price'] * $item['quantity'], 2) ?></div>
+                </div>
+                <form method="POST" class="ms-3">
+                    <input type="hidden" name="remove_cart_id" value="<?= $item['cart_id'] ?>">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                </form>
+            </div>
+        <?php endforeach; ?>
 
-            <button type="submit" name="update" class="btn btn-primary">Update Cart</button>
-            <a href="checkout.php" class="btn btn-success ms-3">Proceed to Checkout</a>
-        </form>
+        <div class="text-end mb-3">
+            <strong>Total: $<?= number_format($total, 2) ?></strong>
+        </div>
+
+        <div class="d-grid gap-2 mb-2">
+            <a href="checkout.php" class="btn btn-primary">Proceed to Checkout</a>
+            <a href="index.php" class="btn btn-secondary">Back to Home</a>
+        </div>
     <?php endif; ?>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+</body>
+</html>
