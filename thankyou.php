@@ -1,17 +1,16 @@
 <?php
 session_start();
-include 'includes/header.php'; 
-
-if (!isset($_SESSION['user'])) {
-    header("Location: login.php");
-    exit;
-}
+include 'includes/header2.php';
 ?>
 
 <div class="container py-5 text-center">
-    <h1 class="mb-4 text-success">Thank You for Your Order!</h1>
-    <p>Your order has been placed successfully.</p>
-    <a href="index.php" class="btn btn-primary mt-3">Back to Home</a>
+    <div class="card shadow p-4 mx-auto" style="max-width: 500px;">
+        <h2 class="text-success mb-3">Thank You for Your Purchase!</h2>
+        <p>Your order has been successfully placed.</p>
+        <div class="d-grid gap-2 mt-4">
+            <a href="index.php" class="btn btn-primary">Return to Home</a>
+        </div>
+    </div>
 </div>
 
-<?php include 'includes/footer.php';  ?>
+<?php include 'includes/footer.php'; ?>

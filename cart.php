@@ -1,6 +1,7 @@
 <?php
 session_start();
 require 'includes/db.php';
+include 'includes/header2.php';
 
 if (!isset($_SESSION['user'])) {
     header("Location: login.php");
@@ -34,16 +35,13 @@ foreach ($cart_items as $item) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Your Cart</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 
-<div class="card p-4 shadow" style="min-width: 400px; max-width: 600px; width: 100%;">
+<body class="bg-light">
+
+<div class = "d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+
+
+<div class="card p-4 shadow" style="min-width: 400px; max-width: 600px; width: 100%; ">
     <h3 class="text-center mb-4">Your Cart</h3>
 
     <?php if (empty($cart_items)): ?>
@@ -57,10 +55,11 @@ foreach ($cart_items as $item) {
                     <div>Qty: <?= $item['quantity'] ?></div>
                     <div>$<?= number_format($item['price'] * $item['quantity'], 2) ?></div>
                 </div>
-                <form method="POST" class="ms-3">
+                <div style ="padding-bottom:15%;">
+                <form method="POST" class="ms-3 ">
                     <input type="hidden" name="remove_cart_id" value="<?= $item['cart_id'] ?>">
                     <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
-                </form>
+                </form></div>
             </div>
         <?php endforeach; ?>
 
@@ -73,7 +72,5 @@ foreach ($cart_items as $item) {
             <a href="index.php" class="btn btn-secondary">Back to Home</a>
         </div>
     <?php endif; ?>
-</div>
-
-</body>
-</html>
+</div></div>
+<?php include 'includes/footer.php';?>
