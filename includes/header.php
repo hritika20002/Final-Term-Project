@@ -8,8 +8,8 @@ if (session_status() === PHP_SESSION_NONE) {
 <head>
     <meta charset="UTF-8" />
     <title>Computer Store - <?= isset($title) ? htmlspecialchars($title) : 'Welcome' ?></title>
-    <link rel="stylesheet" href="/css/bootstrap.css" />
-    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="css/style.css" />
    
 </head>
 <body>

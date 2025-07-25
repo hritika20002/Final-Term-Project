@@ -1,6 +1,8 @@
 <?php
+$title = 'Register';
 session_start();
 require 'includes/db.php';
+include 'includes/header.php';
 
 $error = '';
 $success = '';
@@ -38,15 +40,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register - Online Computer Store</title>
-    <link href="css/style.css" rel="stylesheet">
-</head>
 <body class="bg-light">
-<div class="container mt-5" style="max-width: 400px;">
-    <h2 class="mb-4">Create a New Account</h2>
+
+<div class = "d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+<div class="card p-4 shadow" style="min-width: 400px; max-width: 600px; width: 100%; ">
+    <h2 class="text-center mb-4">Create a New Account</h2>
 
     <?php if ($error): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
@@ -82,6 +80,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </div>
 
     </form>
-</div>
-</body>
-</html>
+    </div> </div>
+    <?php include 'includes/footer.php';?>
